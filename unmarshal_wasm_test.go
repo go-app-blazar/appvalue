@@ -27,6 +27,7 @@ func TestUnmarshal(t *testing.T) {
 	var jsIntegerValue app.Value
 	var jsBooleanValue app.Value
 	var jsFloatValue app.Value
+	var jsStringArrayValue app.Value
 	{
 		jsValue := app.Window().Get("Object").New()
 		jsValue.Set("name", "John")
@@ -42,6 +43,7 @@ func TestUnmarshal(t *testing.T) {
 		jsIntegerValue = jsValue.Get("age")
 		jsBooleanValue = jsValue.Get("isStudent")
 		jsFloatValue = jsValue.Get("height")
+		jsStringArrayValue = jsValue.Get("emailAddresses")
 	}
 
 	t.Run("String", func(t *testing.T) {
@@ -182,6 +184,20 @@ func TestUnmarshal(t *testing.T) {
 			err := Unmarshal(jsValue, &target)
 			require.Error(t, err)
 			require.Equal(t, "", target)
+		})
+	})
+	t.Run("Array", func(t *testing.T) {
+		t.Run("String array", func(t *testing.T) {
+			var target []string
+			err := Unmarshal(jsStringArrayValue, &target)
+			require.NoError(t, err)
+			require.Equal(t, []string{"john1@example.com", "john2@example.com"}, target)
+		})
+		t.Run("Any array", func(t *testing.T) {
+			var target []any
+			err := Unmarshal(jsStringArrayValue, &target)
+			require.NoError(t, err)
+			require.Equal(t, []any{"john1@example.com", "john2@example.com"}, target)
 		})
 	})
 	t.Run("Object", func(t *testing.T) {

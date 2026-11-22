@@ -218,6 +218,25 @@ func parseValue(javascriptValue app.Value, targetValue reflect.Value) error {
 				return fmt.Errorf("failed to parse map at key %s: %w", key, err)
 			}
 		}
+	case reflect.Interface:
+		if debug {
+			slog.Debug("parseValue: Target is an interface.", "javascriptValue", javascriptValue, "targetValue", targetValue, "targetType", targetValue.Type())
+		}
+
+		if targetValue.Type() == reflect.TypeFor[any]() {
+			if debug {
+				slog.Debug("parseValue: Target is an any.", "javascriptValue", javascriptValue, "targetValue", targetValue, "targetType", targetValue.Type())
+			}
+
+			nativePropertyValue, err := valueToNative(javascriptValue)
+			if err != nil {
+				return fmt.Errorf("failed to convert javascript value to native: %w", err)
+			}
+
+			targetValue.Set(reflect.ValueOf(nativePropertyValue))
+		} else {
+			return fmt.Errorf("unsupported target interface: %T", targetValue.Type().String())
+		}
 	default:
 		return fmt.Errorf("unsupported target value kind: %s", targetValue.Kind())
 	}
