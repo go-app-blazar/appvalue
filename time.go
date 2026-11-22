@@ -8,6 +8,12 @@ import (
 	"github.com/maxence-charriere/go-app/v11/pkg/app"
 )
 
+// Timestamp is a time.Time that can be unmarshalled from a JavaScript Date object.
+//
+// It supports unmarshalling from:
+//   - A Date object.
+//   - A number of milliseconds since the Unix epoch.
+//   - A string in RFC3339 format.
 type Timestamp time.Time
 
 func (t *Timestamp) UnmarshalJavascript(javascriptValue app.Value) error {
